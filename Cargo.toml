@@ -1,0 +1,12 @@
+[package]
+name = "bottle"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+btleplug = "0.8.0"
+futures = "0.3.16"
+tokio = { version = "1.9.0", features = ["full"] }
+pretty_env_logger = "0.4.0"
