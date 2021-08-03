@@ -1,5 +1,5 @@
-// See the "macOS permissions note" in README.md before running this on macOS
-// Big Sur or later.
+// If you are running it in MacOS BigSur and later, you have to give permission to Bluetooth to your terminal in Security and privacy.
+// More details in Btleplug README.md: https://github.com/deviceplug/btleplug
 
 use btleplug::api::{Central, CentralEvent, Manager as _};
 use btleplug::platform::{Adapter, Manager};
@@ -25,11 +25,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // event_receiver(), which will return an option. The first time the getter
     // is called, it will return Some(Receiver<CentralEvent>). After that, it
     // will only return None.
-    //
-    // While this API is awkward, is is done as not to disrupt the adapter
-    // retrieval system in btleplug v0.x while still allowing us to use event
-    // streams/channels instead of callbacks. In btleplug v1.x, we'll retrieve
-    // channels as part of adapter construction.
     let mut events = central.events().await?;
 
     // start scanning for devices
@@ -45,7 +40,26 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 manufacturer_data,
             } => {
                 if let Some(data) = manufacturer_data.get(&0xffff_u16) {
-                    println!("Distance: {:?}", core::str::from_utf8(&data).unwrap());
+                    let mut bytes = [0u8; 4];
+
+                    // Copy the bytes reference to an *owned* array of four
+                    // bytes...
+                    //
+                    // NOTE: The length of `data` MUST be 4! Otherwise this
+                    // will panic.
+                    bytes.copy_from_slice(data);
+
+                    // ...so we can consume the bytes, and turn it into an
+                    // integer. This is kind of like safely "casting" from
+                    // a `[u8; 4]` to a u32.
+                    //
+                    // NOTE: James is GUESSING your bytes are in "Big
+                    // Endian" format (this is the 'be' part), but if not,
+                    // you will need something else, like `from_le_bytes`.
+                    let new_data: u32 = u32::from_be_bytes(bytes);
+
+                    // Now we can format that u32 into the output:
+                    println!("Distance: {} units", new_data);
                 }
             }
             _ => {}
