@@ -40,26 +40,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 manufacturer_data,
             } => {
                 if let Some(data) = manufacturer_data.get(&0xffff_u16) {
-                    let mut bytes = [0u8; 4];
-
-                    // Copy the bytes reference to an *owned* array of four
-                    // bytes...
-                    //
-                    // NOTE: The length of `data` MUST be 4! Otherwise this
-                    // will panic.
-                    bytes.copy_from_slice(data);
-
-                    // ...so we can consume the bytes, and turn it into an
-                    // integer. This is kind of like safely "casting" from
-                    // a `[u8; 4]` to a u32.
-                    //
-                    // NOTE: James is GUESSING your bytes are in "Big
-                    // Endian" format (this is the 'be' part), but if not,
-                    // you will need something else, like `from_le_bytes`.
-                    let new_data: u32 = u32::from_be_bytes(bytes);
-
-                    // Now we can format that u32 into the output:
-                    println!("Distance: {} units", new_data);
+                    println!("Distance: {:?}", core::str::from_utf8(&data));
                 }
             }
             _ => {}
