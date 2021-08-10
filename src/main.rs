@@ -40,7 +40,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 manufacturer_data,
             } => {
                 if let Some(data) = manufacturer_data.get(&0xffff_u16) {
-                    println!("Distance: {:?}", core::str::from_utf8(&data));
+                    println!("Distance: {:?}", core::str::from_utf8(&data).unwrap());
                 }
             }
             _ => {}
